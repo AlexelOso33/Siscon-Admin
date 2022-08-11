@@ -368,7 +368,7 @@
         $email = $_POST['email'];
         $user = $_POST['user'];
         $id = $_POST['id'];
-        $url = "https://hello.siscon-system.com/newpassword.php?us=".$id;
+        $url = "https://sisconsystem.online/newpassword.php?us=".$id;
 
         //Convertimos a string sistema
         // $system = ($sistema == 1) ? "POS" : "Distribución";

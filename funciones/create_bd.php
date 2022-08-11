@@ -1,5 +1,8 @@
 <?php
 
+    // die(json_encode($_POST));
+    include_once 'bd_conexion.php';
+
     //Variable global fecha_actual
     $date= date('Y-m-d H:i:s');
     $hoy = strtotime('-3 hour', strtotime($date));
@@ -9,23 +12,44 @@
 if($_POST['action'] == 'create-crud'){
     
     $bd = $_POST['bd'];
+    // die(json_encode($_POST));
+    $database = "sisconsy_".$bd;
+
+    $user = 'admin_siscon';
+    $password = 'alex3344/';
+    $host = 'localhost';
+    
+    $conne = mysqli_connect($host, $user, $password);
+    $conne->set_charset('utf8');
+
+    if (mysqli_connect_errno()) {
+        printf("Connect failed: %s\n", mysqli_connect_error());
+    }
+    
+    try {
+        $sql = "CREATE DATABASE IF NOT EXISTS $database DEFAULT CHARACTER SET utf8  DEFAULT COLLATE utf8_general_ci";
+        $cons = mysqli_query($conne, $sql);
+    } catch (\Throwable $th) {
+        echo "Error: ".$th->getMessage();
+    }
+
+    $conne->close();
+    
     // $step = $_POST['nstep'];
     
     // Variable BD
-    $database = "sisconsy_".$bd;
-        
-    $usuario = 'sisconsy_admin';
-    $password = 'sis25/33?con';
+    
+    $user = 'admin_siscon';
+    $password = 'alex3344/';
     $host = 'localhost';
     
-    $conn1 = mysqli_connect($host, $usuario, $password, $database);
-    if (!$conn1) {
+    $connt = mysqli_connect($host, $user, $password, $database);
+    if (!$connt) {
         die("Connection failed: " . mysqli_connect_error());
     }
-
+    
     // Create database with array
-    // $step1 = "CREATE DATABASE IF NOT EXISTS ".$db;
-    // $step2 = "USE ".$db;
+    $step2 = "USE $database";
     $step3 = "CREATE TABLE ajustes_stock (
             id_ajstock int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
             tipo_ajuste int(1) NOT NULL,
@@ -250,11 +274,11 @@ if($_POST['action'] == 'create-crud'){
     $alt18 = "ALTER TABLE `ventas` ADD FOREIGN KEY (`id_vend_venta`) REFERENCES `vendedores`(`id_vendedor`) ON DELETE RESTRICT ON UPDATE RESTRICT";
     $alt19 = "ALTER TABLE `clientes` ADD FOREIGN KEY (`ciudad`) REFERENCES `ciudades`(`id_ciudad`) ON DELETE RESTRICT ON UPDATE RESTRICT";
 
-    $array_db = array($step3, $step5, $step7, $step9, $step10, $step12, $step13, $step16, $step18, $step20, $step22, $step24, $step26, $step28, $step30, $step32, $step34, $step36, $alt0, $alt1, $alt2, $alt3, $alt4, $alt5, $alt6, $alt7, $alt8, $alt9, $alt10, $alt11, $alt12, $alt13, $alt14, $alt15, $alt16, $alt17, $alt18, $alt19);
+    $array_db = array($step2, $step3, $step5, $step7, $step9, $step10, $step12, $step13, $step16, $step18, $step20, $step22, $step24, $step26, $step28, $step30, $step32, $step34, $step36, $alt0, $alt1, $alt2, $alt3, $alt4, $alt5, $alt6, $alt7, $alt8, $alt9, $alt10, $alt11, $alt12, $alt13, $alt14, $alt15, $alt16, $alt17, $alt18, $alt19);
 
     foreach ($array_db as $k => $v) {
         try {
-            $consulta = mysqli_query($conn1, $v);
+            $consulta = mysqli_query($connt, $v);
             if($consulta === false){
                 $i -= 1 ;
             }
@@ -295,28 +319,18 @@ if($_POST['action'] == 'create-crud'){
     } catch (\Throwable $th) {
        echo "Error: ".$th->getMessage();
     } */
+
+    $conn->close();
     $conn1->close();
+    $connt->close();
+    $stmt1->close();
 }
 
 // Creación de Usuario Business y User Data
 if($_POST['action'] == 'create-bu'){
-
-    // die(json_encode($_POST));
-
-    // Conexión con la BD
-    $database = "sisconsy_admin_data";
-        
-    $usuario = 'sisconsy_admin';
-    $password = 'sis25/33?con';
-    $host = 'localhost';
-    
-    $conn = mysqli_connect($host, $usuario, $password, $database);
-    if (!$conn) {
-        die("Connection failed: " . mysqli_connect_error());
-    }
     
     $id = intval($_POST['id']);
-    $bd = $_POST['bd'];
+    $bd = $_POST['name-bd'];
     
     try {
         $sqlb = "SELECT * FROM `data_sent_site` WHERE `id_data_sent` = $id";
@@ -476,29 +490,17 @@ if($_POST['action'] == 'create-bu'){
 // Nuevo contrato
 if($_POST['action'] == 'alta-contrato'){
 
-    // Conexión con la BD
-    $database = "sisconsy_admin_data";
-        
-    $usuario = 'sisconsy_admin';
-    $password = 'sis25/33?con';
-    $host = 'localhost';
-    
-    $conn = mysqli_connect($host, $usuario, $password, $database);
-    if (!$conn) {
-        die("Connection failed: " . mysqli_connect_error());
-    }
-
     // VARIBLES
     $mail = $_POST['email'];
 
     $sist = $_POST['plan'];
-    $sist = convertSystem($sist);
-    $ts = $sist['ts'];
-    $ps = $sist['ps'];
-    $tps = $sist['tps'];
-    $sql = tomarMontos($ts, $ps, $tps);
-
+    $sistema = convertSystem($sist);
+    $ts = $sistema['ts'];
+    $ps = $sistema['ps'];
+    $tps = $sistema['tps'];
+    
     try {
+        $sql = "SELECT price FROM prices_service WHERE id_price = $sist";
         $cons = $conn->query($sql);
         $monto = $cons->fetch_assoc();
         $monto = $monto['price'];
@@ -509,7 +511,7 @@ if($_POST['action'] == 'alta-contrato'){
     $user = $_POST['usuario'];
     $pass = "none";
     $now = date('Y-m-d h:i:s');
-    $expiration = expirationDate($now, 2); // Envío solamente para 15 dias prueba
+    $expiration = expirationDate($now, 1); // Envío solamente para 15 dias prueba
     $business = $_POST['razon-social'];
     $name = $_POST['nombre'];
     $avatar = "../img/siscon160.png"; // Avatar por defecto SISCON
@@ -611,7 +613,7 @@ if($_POST['action'] == 'alta-contrato'){
 
 /* FUNCIONES */
 
-function tomarMontos($ts, $ps, $tps){
+/* function tomarMontos($ts, $ps, $tps){
     // SISCON POS
     if($ts == 1 && $ps == 1 && $tps == 1){
         $monto = "SELECT * FROM `prices_service` WHERE `id_price` = 3";
@@ -631,7 +633,7 @@ function tomarMontos($ts, $ps, $tps){
         $monto = "SELECT * FROM `prices_service` WHERE `id_price` = 6";
     }
     return $monto;
-}
+} */
 
 function expirationDate($dia, $anual){
     if($anual == 1){
@@ -656,8 +658,8 @@ function convertSystem($sistema){
             $tps = 2;
             break;
             case 2:
-                $ts = 1;
-                $ps = 2;
+                $ts = 2;
+                $ps = 1;
                 $tps = 2;
                 break;
                 case 3:
@@ -666,13 +668,13 @@ function convertSystem($sistema){
                     $tps = 1;
                     break;
                     case 4:
-                        $ts = 1;
-                        $ps = 2;
+                        $ts = 2;
+                        $ps = 1;
                         $tps = 1;
                         break;
                         case 5:
-                            $ts = 2;
-                            $ps = 1;
+                            $ts = 1;
+                            $ps = 2;
                             $tps = 2;
                             break;
                             case 6:
@@ -681,8 +683,8 @@ function convertSystem($sistema){
                                 $tps = 2;
                                 break;
                                 case 7:
-                                    $ts = 2;
-                                    $ps = 1;
+                                    $ts = 1;
+                                    $ps = 2;
                                     $tps = 1;
                                     break;
                                     case 8:
@@ -690,6 +692,16 @@ function convertSystem($sistema){
                                         $ps = 2;
                                         $tps = 1;
                                         break;
+                                        case 9:
+                                            $ts = 1;
+                                            $ps = 3;
+                                            $tps = 2;
+                                            break;
+                                            case 10:
+                                                $ts = 1;
+                                                $ps = 3;
+                                                $tps = 1;
+                                                break;
     }
     $sist = array(
         'ts' => $ts,

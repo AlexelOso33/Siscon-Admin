@@ -5,14 +5,14 @@
   include_once '../templates/barra.php';
   include_once '../templates/navegacion.php';
 
-  try {
-    $sql = "SELECT price FROM prices_service WHERE id_price = 2";
+/*   try {
+    $sql = "SELECT price FROM prices_service WHERE id_price = 1";
     $query = $conn->query($sql);
     $price2 = $query->fetch_assoc();
     $price2 = number_format($price2['price'], 2, ',', '.');
   } catch (\Throwable $th) {
     echo "Error: ".$th->getMessage();
-  }
+  } */
 
 ?>
 
@@ -47,13 +47,13 @@
                 <div class="col-md-4">
                   <div class="form-group">
                     <label for="n-new-emp">CUIT</label>
-                    <input type="number" class="form-control" name="cuit" id="cuit" placeholder="Nº CUIT">
+                    <input type="text" class="form-control" name="cuit" id="cuit" placeholder="Nº CUIT">
                   </div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-group">
                     <label for="n-new-emp">Teléfono</label>
-                    <input type="number" class="form-control" name="telefono" id="telefono" placeholder="Nº Teléfono" required>
+                    <input type="phone" class="form-control" name="telefono" id="telefono" placeholder="Nº Teléfono" required>
                   </div>
                 </div>
                 <div class="col-md-4">
@@ -72,14 +72,18 @@
                   <div class="form-group">
                     <label for="n-new-emp">Plan</label>
                     <select class="form-control select2" name="plan" id="plan_sel" style="width:100%;" required>
-                        <option value="1">POS anual básico</option>
-                        <option value="2" selected>POS anual full</option>
-                        <option value="3">POS mensual básico</option>
-                        <option value="4">POS mensual full</option>
-                        <option value="5">Dist. anual básico</option>
-                        <option value="6">Dist. anual full</option>
-                        <option value="7">Dist. mensual básico</option>
-                        <option value="8">Dist. mensual full</option>
+                      <option value="">- Seleccione -</option>
+                        <?php
+                          try {
+                            $sql = "SELECT * FROM prices_service ORDER BY desc_price DESC";
+                            $cons = mysqli_query($conn, $sql);
+                            while($res = mysqli_fetch_assoc($cons)){ ?>
+                      <option value="<?php echo $res['id_price']; ?>"><?php echo $res['desc_price']; ?></option>
+                        <?php }
+                          } catch (\Throwable $th) {
+                            echo "Error: ".$th->getMessage();
+                          }
+                        ?>
                     </select>
                   </div>
                 </div>
@@ -97,25 +101,25 @@
                 </div>
                 <div class="col-md-12">
                   <div class="content-header">
-                    <h1 class="box-title">$&nbsp;<span id="price-plan"><?php echo $price2; ?></span></h1>
+                    <h1 class="box-title">$&nbsp;<span id="price-plan"></span></h1>
                   </div>
                 </div>
               </div> <!-- Finaliza box body -->
               <div class="box-footer">
                 <input type="hidden" name="action" value="alta-contrato">
                 <input type="hidden" name="usuarioAuth" value="<?php echo $_SESSION['usuario']; ?>">
-                <div class="col-md-3" style="margin-bottom: 10px;">
-                    <input type="submit" class="btn bg-maroon" id="crearBD" value="Crear BD" style="width:100%;line-height:50px;">
+                <div class="col-md-4" style="margin-bottom: 10px;">
+                    <input type="submit" class="btn bg-maroon" id="crearBD" value="Alta" style="width:100%;line-height:50px;">
                 </div>
-                <div class="col-md-3" style="margin-bottom: 10px;">
+                <div class="col-md-4" style="margin-bottom: 10px;">
                     <input type="submit" class="btn bg-blue" id="cobrar" value="Cobrar" style="width:100%;line-height:50px;">
                 </div>
-                <div class="col-md-3" style="margin-bottom: 10px;">
-                    <input type="submit" class="btn bg-olive" id="guardar" value="Guardar datos" style="width:100%;line-height:50px;">
+                <!-- <div class="col-md-3" style="margin-bottom: 10px;">
+                    <input type="submit" class="btn bg-olive" id="guardar" value="Guardar datos" style="width:100%;line-height:50px;" disabled>
                 </div>
                 <div class="col-md-3" style="margin-bottom: 10px;">
-                <input type="submit" class="btn bg-black" id="enviar-inst" value="Enviar instrucciones" style="width:100%;line-height:50px;" disabled>
-                </div>
+                  <input type="submit" class="btn bg-black" id="enviar-inst" value="Enviar instrucciones" style="width:100%;line-height:50px;" disabled>
+                </div> -->
                 <div class="row">
                   <div class="col-md-4"></div>
                   <div class="col-md-4" style="margin-bottom: 10px;">

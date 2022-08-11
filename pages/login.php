@@ -43,7 +43,7 @@
     if($_GET['tosession']){ ?>
     <div class="col-md-12" style="margin-top:20px;">
       <div class="alert alert-danger alert-dismissible" style="text-align:center;">
-          Su sesión se ha cerrado automáticamente después de <b>30 minutos de inactividad</b>.<br>Por favor vuelva a iniciar sesión.
+          Su sesión se ha cerrado automáticamente después de <b>20 minutos de inactividad</b>.<br>Por favor vuelva a iniciar sesión.
       </div>
     </div>
   <?php } ?>

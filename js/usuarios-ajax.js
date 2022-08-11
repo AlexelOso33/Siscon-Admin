@@ -40,14 +40,14 @@ $(document).ready(function() {
     })
 
     // Mensaje de sitio solo administradores //
-    var dir = window.location.href;
+    /* var dir = window.location.href;
     if(dir.indexOf('login.php') > 0){
         swal.fire(
             '¡Atención!',
             'Este sitio es para uso exclusivo de administradores y desarrolladores del sistema SISCON®.',
             'warning'
         )
-    }
+    } */
 
     // Guardar formularios //
     $('#save-forms').on('submit', function(e){
@@ -97,7 +97,7 @@ $(document).ready(function() {
                     if(d.respuesta == 'ok'){
                         var id = d.id;
                         var tel = d.tel;
-                        var url = 'https://siscon-system.com/procesador-pago.php?id='+id+'&response_paym=0';
+                        var url = 'https://app.sisconsystem.online/procesador-pago.php?id='+id+'&response_paym=0';
                         swal.fire({
                             title: '¿Vas a cobrar desde este dispositivo?',
                             showCancelButton: true,
@@ -123,7 +123,7 @@ $(document).ready(function() {
                 }
             })            
         } else if(subm == 'crearBD'){
-            window.open("http://siscon-system.com/cpanel");
+            /* window.open("http://siscon-system.com/cpanel");
             swal.fire({
                 text: '¿Creaste la BD?',
                 allowOutsideClick: false,
@@ -131,9 +131,9 @@ $(document).ready(function() {
                 cancelButtonText: 'No',
                 showCancelButton: true,
             }).then((result) => {
-                if(result.value){
+                if(result.value){ */
                     Swal.fire({
-                        html: '<strong>Realizando acciones de contrato</strong><br><br><strong><span id="chtxtpopup">Paso 1 de 3</span></strong><br><small id="smallpopup" style="font-size: 1.2rem;">Insertando datos de empresa y usuario en la BD</small>',
+                        html: '<strong>Realizando acciones de alta de contrato</strong><br><br><strong><span id="chtxtpopup">Paso 1 de 3</span></strong><br><small id="smallpopup" style="font-size: 1.2rem;">Insertando datos de empresa y usuario en la BD</small>',
                         allowOutsideClick: false,
                         showConfirmButton: false,
                         willOpen: () => {
@@ -146,17 +146,19 @@ $(document).ready(function() {
                         type: 'POST',
                         data: datos,
                         url: '../funciones/create_bd.php',
-                        dataType: 'json',
+                        // dataType: 'json',
                         success: function(data){
                             console.log(data);
-                            if(data.respuesta == 'ok'){
+                            let d = JSON.parse(data);
+                            console.log(d);
+                            if(d.respuesta == 'ok'){
                                 $('#swal2-content #chtxtpopup').html('Paso 2 de 3');
                                 $('#swal2-content #smallpopup').html('Creando base de datos');
-                                var bd = data.bd;
-                                var mail = data.mail;
-                                var name = data.name;
-                                var id = data.id;
-                                var user = data.user;
+                                var bd = d.bd;
+                                var mail = d.mail;
+                                var name = d.name;
+                                var id = d.id;
+                                var user = d.user;
                                 $.ajax({
                                     type: 'POST',
                                     data: {
@@ -182,6 +184,7 @@ $(document).ready(function() {
                                                 url: '../funciones/model.php',
                                                 dataType: 'json',
                                                 success: function(d){
+                                                    console.log(d);
                                                     if(d.respuesta == 'ok'){
                                                         swal.fire(
                                                             'Excelente!',
@@ -217,11 +220,11 @@ $(document).ready(function() {
                             }
                         }
                     });
-                } else {
+                /* } else {
                     $('input[type=text], input[type=number], input[type=email]').attr('readonly', false);
                     $('#plan_sel').attr('disabled', false);
                 }
-            })
+            }) */
         } else if(subm == 'guardar') {
             var user = $('#usuario').val();
             $.ajax({
