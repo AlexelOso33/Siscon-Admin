@@ -560,6 +560,9 @@ if($_POST['action'] == 'alta-contrato'){
                     $emp_address = $address;
                     $emp_city = '';
                     $id = $stmt2->insert_id;
+
+                    $opciones = array('cost' => 12);
+                    $hid = password_hash($n_empresa, PASSWORD_BCRYPT, $opciones);
                     
                     // Insertamos 
                     try {
@@ -574,6 +577,9 @@ if($_POST['action'] == 'alta-contrato'){
                                 'mail' => $mail,
                                 'name' => $name,
                                 'id' => $id,
+                                'bid' => $n_empresa,
+                                'hid' => $hid,
+                                'level' => $level,
                                 'bd' => $bd
                             );
                         } else {

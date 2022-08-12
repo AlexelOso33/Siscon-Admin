@@ -203,7 +203,7 @@
                                 <tbody>
                                     <tr>
                                     <td align="center">
-                                        <a href="https://hello.siscon-system.com" target="_blank"><img width="120" src="https://hello.siscon-system.com/img/icon-rounded.png" alt="Siscon-system"></a>
+                                        <a href="https://sisconsystem.online" target="_blank"><img width="120" src="https://sisconsystem.online/img/icon-rounded.png" alt="Siscon-system"></a>
                                     </td>
                                     <td align="left">
                                         <a href="https://facebook.com/ags.desarrollo.web" target="_blank" class="white">by AGS - Desarrollo Web</a>
@@ -229,7 +229,7 @@
                                     <tr>
                                         <td>
                                             <h3 class="title-body" align="center">%nombre%, tenemos buenas noticias.</h3>
-                                            <p class="lead">Se ha generado el alta de tu acceso a <a href="https://siscon-system.com" target="_blank">Siscon&reg; %sistema%</a> correctamente.</p>
+                                            <p class="lead">Se ha generado el alta de tu acceso a <a href="https://sisconsystem.online" target="_blank">Siscon&reg; %sistema%</a> correctamente.</p>
                                             <table class="callout" width="100%">
                                                 <tbody>
                                                     <tr>

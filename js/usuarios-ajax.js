@@ -85,6 +85,7 @@ $(document).ready(function() {
         e.preventDefault();
         var subm = e.originalEvent.submitter.id;
         var datos = $(this).serializeArray();
+        let tel = $('#telefono').val();
         $('input[type=text], input[type=number], input[type=email]').attr('readonly', true);
         $('#plan_sel').attr('disabled', true);
         if(subm == 'cobrar'){
@@ -146,19 +147,19 @@ $(document).ready(function() {
                         type: 'POST',
                         data: datos,
                         url: '../funciones/create_bd.php',
-                        // dataType: 'json',
+                        dataType: 'json',
                         success: function(data){
-                            console.log(data);
-                            let d = JSON.parse(data);
-                            console.log(d);
-                            if(d.respuesta == 'ok'){
+                            if(data.respuesta == 'ok'){
                                 $('#swal2-content #chtxtpopup').html('Paso 2 de 3');
                                 $('#swal2-content #smallpopup').html('Creando base de datos');
-                                var bd = d.bd;
-                                var mail = d.mail;
-                                var name = d.name;
-                                var id = d.id;
-                                var user = d.user;
+                                let bd = data.bd;
+                                let mail = data.mail;
+                                let name = data.name;
+                                let id = data.id;
+                                let bid = data.bid;
+                                let user = data.user;
+                                let bhid = data.hid;
+                                let level = data.level;
                                 $.ajax({
                                     type: 'POST',
                                     data: {
@@ -167,9 +168,10 @@ $(document).ready(function() {
                                     },
                                     url: '../funciones/create_bd.php',
                                     success: function(data){
-                                        console.log(data);
                                         var d = JSON.parse(data);
                                         if(d.respuesta == 'finish'){
+                                            
+                                            // Envío de mail de alta de contrato.
                                             $('#swal2-content #chtxtpopup').html('Paso 3 de 3');
                                             $('#swal2-content #smallpopup').html('Enviando correo electrónico');     
                                             $.ajax({
@@ -184,22 +186,54 @@ $(document).ready(function() {
                                                 url: '../funciones/model.php',
                                                 dataType: 'json',
                                                 success: function(d){
-                                                    console.log(d);
                                                     if(d.respuesta == 'ok'){
                                                         swal.fire(
                                                             'Excelente!',
-                                                            'Se han completado todos los pasos correctamente. Puede continuar con el COBRO.',
+                                                            'Se han completado todos los pasos correctamente.',
                                                             'success'
-                                                        )
+                                                            )
                                                     } else {
-                                                        swal.fire(
-                                                            'Error',
-                                                            'Ha ocurrido un error al enviar el correo electrónico.',
-                                                            'error'
-                                                        );
+                                                        let mhid = d.hid;
+                                                        swal.fire({
+                                                            text: 'Ha ocurrido un error al intentar enviar el correo electrónico. ¿Deseas enviar el link por WhatsApp?',
+                                                            allowOutsideClick: false,
+                                                            confirmButtonText: 'Si',
+                                                            cancelButtonText: 'No',
+                                                            showCancelButton: true,
+                                                            icon: 'error'
+                                                        }).then((result) => {
+                                                            if(result.value){
+                                                                let url = "https://sisconsystem.online/newpassword.php?us="+id+"&hid="+mhid;
+                                                                let text = "*Siscon system* te envía este link para generar tu contraseña y poder comenzar a utilizar tu plan: %0A";
+                                                                let stext = "%0A Datos de la nueva cuenta: %0A"+"_Nombre:_ *"+name+"*%0A _Correo:_ *"+mail+"*%0A _Usuario:_ *"+user+"*";
+                                                                let message = encodeURIComponent(text) + " " + encodeURIComponent(url) + stext;
+                                                                let whatsapp_url = "whatsapp://send?text="+message+"&phone=+54"+tel+"&abid=+54"+tel;
+                                                                window.location.href = whatsapp_url;
+                                                            }
+                                                        })
                                                     }
+                                                } 
+                                            })
+
+                                            // Envío de WP
+                                            /* let url = 'https://app.sisconsystem.online/procesador-pago.php?id='+bid+'&bhid='+hid+'&l='+level+'&response_paym=PROO';
+                                            swal.fire({
+                                                title: '¿Vas a cobrar desde este dispositivo?',
+                                                showCancelButton: true,
+                                                confirmButtonText: 'Si, desde aquí',
+                                                cancelButtonText: 'No, compartir link'
+                                            }).then((result) => {
+                                                if(result.value){
+                                                    window.open(url, '_blank');
+                                                } else {
+                                                    let text = "*Siscon system* te envía este link de pago para comenzar a utilizar tu plan: %0A ";
+                                                    let stext = "Datos de la nueva cuenta: %0A"+"_Nombre:_ *"+name+"*%0A _Correo:_ *"+mail+"*%0A _Usuario:_ *"+user+"*";
+                                                    let message = encodeURIComponent(text) + " " + encodeURIComponent(url) + "%0A" +stext;
+                                                    let whatsapp_url = "whatsapp://send?text="+message+"&phone=+54"+tel+"&abid=+54"+tel;
+                                                    window.location.href = whatsapp_url;
                                                 }
-                                            })                                         
+                                            }) */
+
                                         } else if(d.respuesta == 'error') {
                                             clearInterval(enviarInfo);
                                             var step = d.step;
@@ -255,8 +289,9 @@ $(document).ready(function() {
         }
     })
 
-    $('#sabe-contract').on('reset', function(){
+    $('#save-contract').on('reset', function(){
         $('input[type=text], input[type=number], input[type=email]').attr('readonly', false);
+        $('input[type=text], input[type=number], input[type=email]').attr('disabled', false);
         $('#plan_sel').attr('disabled', false);
     })
 

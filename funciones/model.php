@@ -147,7 +147,7 @@
     	die(json_encode($respuesta));
     }
 
-    // Envío de confirmación de mail
+    // Envío de confirmación de mail desde HOME-SISCON
     if($_POST['accion'] == 'mailer-confirm'){
         
         // Comprobación CHECKED ReCaptcha
@@ -228,6 +228,54 @@
     	        'respuesta' => 'robot'  
 	        );
     	}
+        die(json_encode($respuesta));
+    }
+    // Envío de confirmación de mail desde ADMIN-SISCON
+    if($_POST['accion'] == 'mail-confirm'){
+
+        // conversión código activación
+        $email = $_POST['email'];
+        $name = $_POST['name'];
+        $opciones = array('cost' => 12);
+        $key = password_hash($name, PASSWORD_BCRYPT, $opciones);
+
+        $title = 'Alta de usuario';
+        $url = 'https://sisconsystem.online/activate?a='.$key;
+        $mensaje = file_get_contents('mailer2.php');
+        
+        // Replace variables en HTML
+        $mensaje = str_replace('%sistema%', $system, $mensaje);
+        $mensaje = str_replace('%nombre%', $name, $mensaje);
+        $mensaje = str_replace('%url%', $url, $mensaje);
+        $mensaje = str_replace('%activacion%', $key, $mensaje);
+
+        $mail = new PHPMailer;
+        $mail->CharSet = 'UTF-8';
+        $mail->isSMTP();
+        $mail->SMTPDebug = 0;
+        $mail->Host = 'smtp.hostinger.com';
+        $mail->Port = 465;
+        $mail->SMTPAuth = true;
+        $mail->Username = 'no-responder@sisconsystem.online';
+        $mail->Password = 'alex2526';
+        $mail->SMTPSecure = 'ssl'; //Este era el error
+        $mail->setFrom('no-responder@sisconsystem.online', 'Siscon System');
+        $mail->addAddress($email, $name);
+        $mail->Subject = $title;
+        $mail->isHTML(true);
+        $mail->msgHTML($mensaje);
+        $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
+        //$mail->addAttachment('test.txt');
+        if (!$mail->send()) {
+            $respuesta = array(
+                'respuesta' => 'error',
+                'error' => $mail->ErrorInfo
+            );
+        } else {
+            $respuesta = array(
+                'respuesta' => 'ok'
+            );
+        }
         die(json_encode($respuesta));
     }
 
@@ -328,7 +376,7 @@
         $mensaje = str_replace('%nombre%', $name, $mensaje);
         $mensaje = str_replace('%usuario%', $user, $mensaje);
         
-        $alt_msg = 'Se ha generado el alta de tu acceso a Siscon® correctamente. Ingresa a https://siscon-system.com con tu nuevo usuario '.$user.' y empieza a distrutar de la nueva #ExperienciaSiscon.';
+        $alt_msg = 'Se ha generado el alta de tu acceso a Siscon® correctamente. Ingresa a https://sisconsystem.online con tu nuevo usuario '.$user.' y empieza a distrutar de la nueva #ExperienciaSiscon.';
 
         $mail = new PHPMailer;
         $mail->CharSet = 'UTF-8';
@@ -368,32 +416,36 @@
         $email = $_POST['email'];
         $user = $_POST['user'];
         $id = $_POST['id'];
-        $url = "https://sisconsystem.online/newpassword.php?us=".$id;
+        $opciones = array('cost' => 12);
+        $hid = password_hash($id, PASSWORD_BCRYPT, $opciones);
+        $mhid = password_hash($email, PASSWORD_BCRYPT, $opciones);
+
+        $url = "https://sisconsystem.online/activate.php?m=".$email."&a=".$mhid;
 
         //Convertimos a string sistema
         // $system = ($sistema == 1) ? "POS" : "Distribución";
 
         $title = 'Hemos registrado tu nuevo usuario';
-        $mensaje = file_get_contents('mailer-contrato.html');
+        $mensaje = file_get_contents('comp-mail.html');
         
         // Replace variables en HTML
         $mensaje = str_replace('%url%', $url, $mensaje);
         $mensaje = str_replace('%nombre%', $name, $mensaje);
-        $mensaje = str_replace('%usuario%', $user, $mensaje);
+        // $mensaje = str_replace('%usuario%', $user, $mensaje);
         
-        $alt_msg = 'Se ha generado el alta de tu usuario '.$user.' correctamente. Ingresa a '.$url.' y genera tu nueva contraseña.';
+        $alt_msg = 'Se ha generado el alta de tu usuario '.$user.' correctamente. Ingresa a '.$url.', confirma este correo y genera tu nueva contraseña.';
 
         $mail = new PHPMailer;
         $mail->CharSet = 'UTF-8';
         $mail->isSMTP();
         $mail->SMTPDebug = 0;
-        $mail->Host = 'mail.siscon-system.com';
+        $mail->Host = 'smtp.hostinger.com';
         $mail->Port = 465;
         $mail->SMTPAuth = true;
-        $mail->Username = 'no-responder@siscon-system.com';
-        $mail->Password = 'alex2526';
+        $mail->Username = 'no-responder@sisconsystem.online';
+        $mail->Password = 'Alan2526?';
         $mail->SMTPSecure = 'ssl'; //Este era el error
-        $mail->setFrom('no-responder@siscon-system.com', 'Siscon Systems');
+        $mail->setFrom('no-responder@sisconsystem.online', 'Siscon System');
         $mail->addAddress($email, $name);
         $mail->Subject = $title;
         $mail->isHTML(true);
@@ -403,11 +455,13 @@
         if (!$mail->send()) {
             $respuesta = array(
                 'respuesta' => 'errorMail',
-                'error' => $mail->ErrorInfo
+                'error' => $mail->ErrorInfo,
+                'hid' => $hid
             );
         } else {
             $respuesta = array(
-                'respuesta' => 'ok'
+                'respuesta' => 'ok',
+                'hid' => $hid
             );
         }
             
